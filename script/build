@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+
+# quick and dirty script to build the binaries
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." > /dev/null && pwd)"
+
+set -e -x
+
+mkdir -p $REPO_ROOT/bin
+go build -o $REPO_ROOT/bin/ $REPO_ROOT/...

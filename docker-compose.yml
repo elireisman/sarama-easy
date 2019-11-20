@@ -1,0 +1,33 @@
+version: '3.4'
+
+services:
+  zookeeper:
+    image: confluentinc/cp-zookeeper:4.1.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    healthcheck:
+      start_period: 10s
+      interval: 60s
+      retries: 3
+      test: ["CMD", "echo", "ruok", "|", "nc", "127.0.0.1", "5111"]
+
+  kafka:
+    image: confluentinc/cp-kafka:4.1.0
+    container_name: kafka
+    ports:
+      - 127.0.0.1:9092:9092
+    depends_on:
+      - zookeeper
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://127.0.0.1:9092
+      KAFKA_AUTO_CREATE_TOPICS_ENABLE: "true"
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    healthcheck:
+      start_period: 10s
+      interval: 60s
+      retries: 3
+      test: ["CMD", "kafka-topics.sh", "--zookeeper", "zookeeper:2181", "--list", "&>/dev/null"]
